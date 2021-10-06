@@ -21,7 +21,7 @@ class FloorController extends AbstractController
     }
 
     #[Route('/floors', methods: ['POST'], name: 'floor-create')]
-    public function createFloor(Request $request, ValidatorInterface $validator): Response {
+    public function create(Request $request, ValidatorInterface $validator): Response {
 
         $entityManager = $this->getDoctrine()->getManager();
 
