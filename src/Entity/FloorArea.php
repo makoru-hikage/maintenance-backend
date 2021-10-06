@@ -10,6 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=FloorAreaRepository::class)
+ * @UniqueEntity(
+ *  fields={"area_code"},
+ *  message="floorarea.code.unique"
+ * )
  */
 class FloorArea implements JsonSerializable
 {
