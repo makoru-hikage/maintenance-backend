@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use JsonSerializable;
+
 use App\Repository\FloorRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -14,7 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  *  message="floor.code.unique"
  * )
  */
-class Floor
+class Floor implements JsonSerializable
 {
     /**
      * @ORM\Id
@@ -93,5 +95,14 @@ class Floor
 
     public function restore(){
         $this->is_deleted = 0;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'code' => $this->code,
+            'rows' => $this->total_rows,
+            'cols' => $this->total_cols,
+        ];
     }
 }
