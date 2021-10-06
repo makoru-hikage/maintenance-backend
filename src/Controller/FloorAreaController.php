@@ -34,21 +34,19 @@ class FloorAreaController extends AbstractController
 
     public function validateRowCol ($data, $maxRow, $maxCol){
         $errorMessages = [];
-        $maxMessage = 'Max row: '. $maxRow .'; Max column' . $maxCol;
+        $maxMessage = 'Max row: '. $maxRow .'; Max column: ' . $maxCol;
 
         if ($data['row'] < 1 || $data['row'] > $maxRow){
-            $errorMessages['row'] = 'Row out of range';
-            $errorMessages['max'] = $maxMessage;
+            $errorMessages['row'] = ['Row out of range', $maxMessage];
         }
 
         if ($data['col'] < 1 || $data['col'] > $maxCol){
-            $errorMessages['col'] = 'Column out of range';
-            $errorMessages['max'] = $maxMessage;
+            $errorMessages['col'] = ['Column out of range', $maxMessage];
         }
 
-        // The RowCol combination must be used by another Floor Area
+        // The RowCol combination must not be used by another Floor Area
         if ($this->findByRowCol($data['row'], $data['col'])){
-            $errorMessages['rowcol'] = 'Row and column combination not valid'; 
+            $errorMessages['rowcol'] = ['Row and column combination not valid']; 
         }
 
         return $errorMessages;
@@ -120,7 +118,7 @@ class FloorAreaController extends AbstractController
         // Check if the Floor exists, otherwise the area can't be registered
         if (!$floor){
             $errorMsg = [
-                'floor' => 'The floor does not exist'
+                'floor' => ['The floor does not exist']
             ];
             return $this->json($errorMsg, 400);
         }
