@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use App\Entity\FloorArea;
 use App\Entity\Floor;
+use App\Factory\FloorAreaFactory;
 
 class FloorAreaController extends AbstractController
 {
@@ -19,6 +20,30 @@ class FloorAreaController extends AbstractController
 
         return $floor;
     }
+
+    public function findByRowCol($row, $col){
+        $repo = $this->getDoctrine()->getRepository(FloorArea::class);
+        $floorArea = $repo->findOneBy([
+            'is_deleted' => 0,
+            'floor_row' => $row,
+            'floor_col' => $col
+        ]);
+
+        return $floorArea;
+    }
+
+    public function validateEntity(ValidatorInterface $validator, $entity){
+        $errors = $validator->validate($entity);
+        $messages = [];
+        if (count($errors) > 0) {
+            foreach ($errors as $violation) {
+                $messages[$violation->getPropertyPath()][] = $violation->getMessage();
+            }
+        }
+
+        return $messages;
+    }
+
     #[Route('/floorareas', methods: ['GET'], name: 'floor_area')]
     public function index(): Response
     {
@@ -32,15 +57,8 @@ class FloorAreaController extends AbstractController
     public function createFloor(Request $request, ValidatorInterface $validator): Response {
 
         $entityManager = $this->getDoctrine()->getManager();
-
         $data = json_decode($request->getContent(), true);
-
-        $description = $data['description'];
-        $floorCode = $data['floor'];
-        $row = $data['row'];
-        $col = $data['col'];
-
-        $floor = $this->findFloor($floorCode);
+        $floor = $this->findFloor($data['floor']);
 
         if (!$floor){
             $errorMsg = [
@@ -49,22 +67,19 @@ class FloorAreaController extends AbstractController
             return $this->json($errorMsg, 400);
         }
 
-        $floorCode = $floor->getCode();
+        if ($this->findByRowCol($data['row'], $data['col'])){
+            $errorMsg = [
+                'floor' => 'Row and column combination already registered'
+            ];
+            return $this->json($errorMsg, 400);
+        }
 
-        $floorArea = new FloorArea();
-        $floorArea->setAreaCode($floorCode . '-' . $row . '-' . $col);
-        $floorArea->setDescription($description);
+        $floorArea = (new FloorAreaFactory($data))->create();
         $floorArea->setFloorId($floor->getId());
-        $floorArea->setFloorRow($row);
-        $floorArea->setFloorCol($col);
 
-        $errors = $validator->validate($floorArea);
-        if (count($errors) > 0) {
-            $messages = [];
-            foreach ($errors as $violation) {
-                $messages[$violation->getPropertyPath()][] = $violation->getMessage();
-            }
-            return $this->json($messages, 400);
+        $errorMessages = $this->validateEntity($validator, $floorArea);
+        if ($errorMessages){
+            return $this->json($errorMessages, 400);
         }
 
         // tell Doctrine you want to (eventually) save the Product (no queries yet)
