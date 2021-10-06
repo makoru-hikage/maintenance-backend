@@ -19,6 +19,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 class FloorArea implements JsonSerializable
 {
     const STATUSES = ['Available', 'Reserved', 'Unavailable', 'Occupied'];
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
