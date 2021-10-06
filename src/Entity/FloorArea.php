@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use JsonSerializable;
+
 use App\Repository\FloorAreaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -9,8 +11,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=FloorAreaRepository::class)
  */
-class FloorArea
+class FloorArea implements JsonSerializable
 {
+    const STATUSES = ['Available', 'Reserved', 'Unavailable', 'Occupied'];
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -44,6 +47,12 @@ class FloorArea
      * @Assert\Positive
      */
     private $floor_col;
+
+    /**
+     * @ORM\Column(type="string")
+     * @Assert\Choice(choices=Author::STATUSES, message="Choose a valid status.")
+     */
+    private $status;
 
     /**
      * @ORM\Column(type="integer")
@@ -122,5 +131,15 @@ class FloorArea
 
     public function restore(){
         $this->is_deleted = 0;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'area_code' => $this->area_code,
+            'description' => $this->description,
+            'row' => $this->floor_row,
+            'col' => $this->floor_col,
+        ];
     }
 }
