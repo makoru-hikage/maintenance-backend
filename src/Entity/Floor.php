@@ -40,6 +40,12 @@ class Floor
      */
     private $total_cols;
 
+    /**
+     * @ORM\Column(type="integer")
+     *
+     */
+    private $is_deleted = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -79,5 +85,13 @@ class Floor
         $this->total_cols = $cols;
 
         return $this;
+    }
+
+    public function soft_delete(){
+        $this->is_deleted = 1;
+    }
+
+    public function restore(){
+        $this->is_deleted = 0;
     }
 }

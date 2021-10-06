@@ -45,6 +45,12 @@ class FloorArea
      */
     private $floor_col;
 
+    /**
+     * @ORM\Column(type="integer")
+     *
+     */
+    private $is_deleted = 0;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -108,5 +114,13 @@ class FloorArea
         $this->floor_col = $col;
 
         return $this;
+    }
+
+    public function soft_delete(){
+        $this->is_deleted = 1;
+    }
+
+    public function restore(){
+        $this->is_deleted = 0;
     }
 }
