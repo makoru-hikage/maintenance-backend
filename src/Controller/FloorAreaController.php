@@ -66,13 +66,46 @@ class FloorAreaController extends AbstractController
         return $messages;
     }
 
-    #[Route('/floorareas', methods: ['GET'], name: 'floor_area')]
+    #[Route('/floorareas', methods: ['GET'], name: 'floorareas')]
     public function index(): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/FloorAreaController.php',
-        ]);
+        // Prepare and fetch all the Floor Areas
+        $repo = $this->getDoctrine()->getRepository(FloorArea::class);
+        $floorRepo = $this->getDoctrine()->getRepository(Floor::class);
+        $floorAreas = $repo->findBy(['is_deleted' => 0]);
+
+        // Get an array of Floor IDs refered by Floor Areas
+        $floorIds = array_map(fn($x) => $x->getFloorId(), $floorAreas);
+
+        // Fetch all the Floors using the IDs.
+        $floors = $floorRepo->findBy(['is_deleted' => 0, 'id' => $floorIds]);
+
+        // Create an array where: 'floor_id' => 'floor_code'
+        $floorCodes = array_reduce(
+            $floors,
+            function($acc, $floor) {
+                $acc[$floor->getId()] = $floor->getCode();
+                return $acc;
+            }, []);
+
+        // Serialise all the entities with their FloorId intact
+        $serialisedData = array_map(
+            function($area) {
+                $floor_id = $area->getFloorId();
+                $area = $area->jsonSerialize();
+                $area['floor'] = $floor_id;
+                return $area;
+            }, $floorAreas);
+
+        // Convert those FloorId into Floor Codes
+        $finalData = array_map(
+            function($area) use ($floorCodes) {
+                $area['floor'] = $floorCodes[$area['floor']];
+                return $area;
+            }, $serialisedData);
+
+        return $this->json($finalData);
+
     }
 
     #[Route('/floorareas', methods: ['POST'], name: 'floorarea-create')]
