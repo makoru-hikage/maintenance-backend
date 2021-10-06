@@ -9,7 +9,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 use App\Entity\Floor;
-use App\Repository\FloorRepository;
 
 class FloorController extends AbstractController
 {
