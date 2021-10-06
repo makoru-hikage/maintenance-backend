@@ -146,6 +146,7 @@ class FloorArea implements JsonSerializable
             'description' => $this->description,
             'row' => $this->floor_row,
             'col' => $this->floor_col,
+            'status' => $this->status,
         ];
     }
 }
