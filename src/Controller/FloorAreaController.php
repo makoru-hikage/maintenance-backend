@@ -168,6 +168,9 @@ class FloorAreaController extends AbstractController
 
         // Get the target entity and get the Response Body
         $floorArea = $repo->findOneBy(['is_deleted' => 0, 'area_code' => $code]);
+        if (!$floorArea){
+            return new Response('', 404);
+        }
         $data = json_decode($request->getContent(), true);
 
         // This is for tracking any changes for Floor.
@@ -222,12 +225,18 @@ class FloorAreaController extends AbstractController
         return new Response('', 204);
     }
 
-    #[Route('/floorareas/{code}/status', methods: ['PATCH'], name: 'floorarea-edit')]
+    #[Route('/floorareas/{code}/status', methods: ['PATCH'], name: 'floorarea-status')]
     public function changeStatus($code, Request $request, ValidatorInterface $validator){
 
         $entityManager = $this->getDoctrine()->getManager();
         $repo = $this->getDoctrine()->getRepository(FloorArea::class);
+
         $floorArea = $repo->findOneBy(['is_deleted' => 0, 'area_code' => $code]);
+
+        if (!$floorArea){
+            return new Response('', 404);
+        }
+
         $data = json_decode($request->getContent(), true);
 
         // We need to check if there's a 'status' key in the JSON payload
@@ -247,6 +256,20 @@ class FloorAreaController extends AbstractController
             return $this->json($errorMessages, 400);
         }
 
+        // Persist to DB permanently
+        $entityManager->flush();
+
+        return new Response('', 204);
+    }
+
+    #[Route('/floorareas/{code}', methods: ['DELETE'], name: 'floorarea-delete')]
+    public function delete($code){
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $repo = $this->getDoctrine()->getRepository(FloorArea::class);
+        $floorArea = $repo->findOneBy(['is_deleted' => 0, 'area_code' => $code]);
+
+        $entityManager->remove($floorArea);
         // Persist to DB permanently
         $entityManager->flush();
 
