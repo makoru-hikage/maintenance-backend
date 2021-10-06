@@ -32,6 +32,27 @@ class FloorAreaController extends AbstractController
         return $floorArea;
     }
 
+    public function validateRowCol ($data, $maxRow, $maxCol){
+        $errorMessages = [];
+        $maxMessage = 'Max row: '. $maxRow .'; Max column' . $maxCol;
+
+        if ($data['row'] < 1 || $data['row'] > $maxRow){
+            $errorMessages['row'] = 'Row out of range';
+            $errorMessages['max'] = $maxMessage;
+        }
+
+        if ($data['col'] < 1 || $data['col'] > $maxCol){
+            $errorMessages['col'] = 'Column out of range';
+            $errorMessages['max'] = $maxMessage;
+        }
+
+        if ($this->findByRowCol($data['row'], $data['col'])){
+            $errorMessages['rowcol'] = 'Row and column combination not valid'; 
+        }
+
+        return $errorMessages;
+    }
+
     public function validateEntity(ValidatorInterface $validator, $entity){
         $errors = $validator->validate($entity);
         $messages = [];
@@ -60,6 +81,7 @@ class FloorAreaController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $floor = $this->findFloor($data['floor']);
 
+        // Check if the Floor exists, otherwise the area can't be registered
         if (!$floor){
             $errorMsg = [
                 'floor' => 'The floor does not exist'
@@ -67,12 +89,14 @@ class FloorAreaController extends AbstractController
             return $this->json($errorMsg, 400);
         }
 
-        if ($this->findByRowCol($data['row'], $data['col'])){
-            $errorMsg = [
-                'floor' => 'Row and column combination already registered'
-            ];
-            return $this->json($errorMsg, 400);
-        }
+        $rowColErrors = $this->validateRowCol(
+            $data,
+            $floor->getTotalRows(),
+            $floor->getTotalCols());
+
+            if ($rowColErrors){
+                return $this->json($rowColErrors, 400);
+            }
 
         $floorArea = (new FloorAreaFactory($data))->create();
         $floorArea->setFloorId($floor->getId());
