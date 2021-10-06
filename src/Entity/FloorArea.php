@@ -50,9 +50,9 @@ class FloorArea implements JsonSerializable
 
     /**
      * @ORM\Column(type="string")
-     * @Assert\Choice(choices=Author::STATUSES, message="Choose a valid status.")
+     * @Assert\Choice(choices=FloorArea::STATUSES, message="Choose a valid status.")
      */
-    private $status;
+    private $status = 'Available';
 
     /**
      * @ORM\Column(type="integer")
