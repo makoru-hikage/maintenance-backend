@@ -9,7 +9,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=FloorRepository::class)
- * @UniqueEntity("code")
+ * @UniqueEntity(
+ *  fields={"code"},
+ *  message="floor.code.unique"
+ * )
  */
 class Floor
 {
