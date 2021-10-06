@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\FloorAreaRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=FloorAreaRepository::class)
@@ -36,13 +37,13 @@ class FloorArea
      * @ORM\Column(type="integer")
      * @Assert\Positive
      */
-    private $row;
+    private $floor_row;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\Positive
      */
-    private $col;
+    private $floor_col;
 
     public function getId(): ?int
     {
@@ -85,26 +86,26 @@ class FloorArea
         return $this;
     }
 
-    public function getRow(): ?int
+    public function getFloorRow(): ?int
     {
-        return $this->row;
+        return $this->floor_row;
     }
 
-    public function setRow(int $row): self
+    public function setFloorRow(int $row): self
     {
-        $this->row = $row;
+        $this->floor_row = $row;
 
         return $this;
     }
 
-    public function getCol(): ?int
+    public function getFloorCol(): ?int
     {
-        return $this->col;
+        return $this->floor_col;
     }
 
-    public function setCol(int $col): self
+    public function setFloorCol(int $col): self
     {
-        $this->col = $col;
+        $this->floor_col = $col;
 
         return $this;
     }

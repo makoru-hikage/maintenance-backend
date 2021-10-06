@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\FloorRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=FloorRepository::class)
@@ -21,7 +22,6 @@ class Floor
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Assert\Email
      */
     private $code;
 
@@ -29,13 +29,13 @@ class Floor
      * @ORM\Column(type="integer")
      * @Assert\Positive
      */
-    private $rows;
+    private $total_rows;
 
     /**
      * @ORM\Column(type="integer")
      * @Assert\Positive
      */
-    private $cols;
+    private $total_cols;
 
     public function getId(): ?int
     {
@@ -54,26 +54,26 @@ class Floor
         return $this;
     }
 
-    public function getRows(): ?int
+    public function getTotalRows(): ?int
     {
-        return $this->rows;
+        return $this->total_rows;
     }
 
-    public function setRows(int $rows): self
+    public function setTotalRows(int $rows): self
     {
-        $this->rows = $rows;
+        $this->total_rows = $rows;
 
         return $this;
     }
 
-    public function getCols(): ?int
+    public function getTotalCols(): ?int
     {
-        return $this->cols;
+        return $this->total_cols;
     }
 
-    public function setCols(int $cols): self
+    public function setTotalCols(int $cols): self
     {
-        $this->cols = $cols;
+        $this->total_cols = $cols;
 
         return $this;
     }
