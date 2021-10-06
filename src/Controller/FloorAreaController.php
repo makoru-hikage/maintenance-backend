@@ -46,6 +46,7 @@ class FloorAreaController extends AbstractController
             $errorMessages['max'] = $maxMessage;
         }
 
+        // The RowCol combination must be used by another Floor Area
         if ($this->findByRowCol($data['row'], $data['col'])){
             $errorMessages['rowcol'] = 'Row and column combination not valid'; 
         }
@@ -79,6 +80,8 @@ class FloorAreaController extends AbstractController
 
         $entityManager = $this->getDoctrine()->getManager();
         $data = json_decode($request->getContent(), true);
+
+        // Find if the refered floor exists
         $floor = $this->findFloor($data['floor']);
 
         // Check if the Floor exists, otherwise the area can't be registered
@@ -89,18 +92,22 @@ class FloorAreaController extends AbstractController
             return $this->json($errorMsg, 400);
         }
 
+        // The row and col must neither be previously registered
+        // nor be it less than 1 or exceed the capacity of the floor
         $rowColErrors = $this->validateRowCol(
             $data,
             $floor->getTotalRows(),
             $floor->getTotalCols());
 
-            if ($rowColErrors){
-                return $this->json($rowColErrors, 400);
-            }
+        if ($rowColErrors){
+            return $this->json($rowColErrors, 400);
+        }
 
+        // Create and load the entity with data from the Request Body.
         $floorArea = (new FloorAreaFactory($data))->create();
         $floorArea->setFloorId($floor->getId());
 
+        // Run Symfony's validator
         $errorMessages = $this->validateEntity($validator, $floorArea);
         if ($errorMessages){
             return $this->json($errorMessages, 400);
