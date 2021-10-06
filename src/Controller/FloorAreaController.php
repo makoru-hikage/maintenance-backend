@@ -46,7 +46,7 @@ class FloorAreaController extends AbstractController
 
         // The RowCol combination must not be used by another Floor Area
         if ($this->findByRowCol($data['row'], $data['col'])){
-            $errorMessages['rowcol'] = ['Row and column combination not valid']; 
+            $errorMessages['rowcol'] = ['Row and column combination already taken']; 
         }
 
         return $errorMessages;
@@ -151,5 +151,74 @@ class FloorAreaController extends AbstractController
         $entityManager->flush();
 
         return $this->json([], 201);
+    }
+
+    /**
+     * TODO: A class to implement changes to an entity 
+     * to make this controller thinner.
+     */
+    #[Route('/floorareas/{code}', methods: ['PATCH'], name: 'floorarea-edit')]
+    public function edit($code, Request $request, ValidatorInterface $validator){
+
+        $entityManager = $this->getDoctrine()->getManager();
+
+        // Initiate the relevant repos
+        $repo = $this->getDoctrine()->getRepository(FloorArea::class);
+        $floorRepo = $this->getDoctrine()->getRepository(Floor::class);
+
+        // Get the target entity and get the Response Body
+        $floorArea = $repo->findOneBy(['is_deleted' => 0, 'area_code' => $code]);
+        $data = json_decode($request->getContent(), true);
+
+        // This is for tracking any changes for Floor.
+        $floor = null;
+
+        if ($data['floor']){
+            $floor = $floorRepo->findOneBy(['is_deleted' => 0, 'code' => $data['floor']]);
+
+            // Check if the Floor exists, otherwise the area can't be registered
+            if (!$floor){
+                $errorMsg = [
+                    'floor' => ['The floor does not exist']
+                ];
+                return $this->json($errorMsg, 400);
+            }
+
+            $floorArea->setFloorId($floor->getId());
+        }
+
+        if (isset($data['row']) && isset($data['col'])){
+
+            if ($floor === null) {
+                $floor = $floorRepo->findOneBy(
+                    ['is_deleted' => 0, 'id' => $floorArea->getFloorId()]
+                );
+            }
+
+            $rowColErrors = $this->validateRowCol(
+                $data,
+                $floor->getTotalRows(),
+                $floor->getTotalCols());
+
+            if ($rowColErrors){
+                return $this->json($rowColErrors, 400);
+            }
+        }
+
+        if (isset($data['description'])){
+            $floorArea->setDescription($data['description']);
+        }
+
+        if (isset($data['row'])){
+            $floorArea->setFloorRow($data['row']);
+        }
+
+        if (isset($data['col'])){
+            $floorArea->setFloorCol($data['col']);
+        }
+
+        $entityManager->flush();
+
+        return new Response('', 204);
     }
 }
