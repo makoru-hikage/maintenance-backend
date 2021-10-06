@@ -221,4 +221,35 @@ class FloorAreaController extends AbstractController
 
         return new Response('', 204);
     }
+
+    #[Route('/floorareas/{code}/status', methods: ['PATCH'], name: 'floorarea-edit')]
+    public function changeStatus($code, Request $request, ValidatorInterface $validator){
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $repo = $this->getDoctrine()->getRepository(FloorArea::class);
+        $floorArea = $repo->findOneBy(['is_deleted' => 0, 'area_code' => $code]);
+        $data = json_decode($request->getContent(), true);
+
+        // We need to check if there's a 'status' key in the JSON payload
+        if (!isset($data['status'])) {
+            $errorMsg = [
+                'status' => ['Please set status to either Available, Reserved, Unavailable, or Occupied']
+            ];
+            return $this->json($errorMsg, 400);
+        }
+
+        // Set it
+        $floorArea->setStatus($data['status']);
+
+        // Run Symfony's validator
+        $errorMessages = $this->validateEntity($validator, $floorArea);
+        if ($errorMessages){
+            return $this->json($errorMessages, 400);
+        }
+
+        // Persist to DB permanently
+        $entityManager->flush();
+
+        return new Response('', 204);
+    }
 }

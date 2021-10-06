@@ -131,6 +131,18 @@ class FloorArea implements JsonSerializable
         return $this;
     }
 
+    public function getStatus(): ?int
+    {
+        return $this->floor_col;
+    }
+
+    public function setStatus($status): self
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
     public function soft_delete(){
         $this->is_deleted = 1;
     }
