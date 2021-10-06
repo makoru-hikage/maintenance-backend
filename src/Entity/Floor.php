@@ -4,9 +4,11 @@ namespace App\Entity;
 
 use App\Repository\FloorRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=FloorRepository::class)
+ * @UniqueEntity("code")
  */
 class Floor
 {
@@ -19,16 +21,19 @@ class Floor
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\Email
      */
     private $code;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Positive
      */
     private $rows;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Positive
      */
     private $cols;
 

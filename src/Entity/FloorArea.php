@@ -34,11 +34,13 @@ class FloorArea
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Positive
      */
     private $row;
 
     /**
      * @ORM\Column(type="integer")
+     * @Assert\Positive
      */
     private $col;
 
