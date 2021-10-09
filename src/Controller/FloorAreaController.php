@@ -64,7 +64,7 @@ class FloorAreaController extends AbstractController
         return $messages;
     }
 
-    #[Route('/floorareas', methods: ['GET'], name: 'floorareas')]
+    #[Route('/api/floorareas', methods: ['GET'], name: 'floorareas')]
     public function index(): Response
     {
         // Prepare and fetch all the Floor Areas
@@ -106,7 +106,7 @@ class FloorAreaController extends AbstractController
 
     }
 
-    #[Route('/floorareas', methods: ['POST'], name: 'floorarea-create')]
+    #[Route('/api/floorareas', methods: ['POST'], name: 'floorarea-create')]
     public function create(Request $request, ValidatorInterface $validator): Response {
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -157,7 +157,7 @@ class FloorAreaController extends AbstractController
      * TODO: A class to implement changes to an entity 
      * to make this controller thinner.
      */
-    #[Route('/floorareas/{code}', methods: ['PATCH'], name: 'floorarea-edit')]
+    #[Route('/api/floorareas/{code}', methods: ['PATCH'], name: 'floorarea-edit')]
     public function edit($code, Request $request, ValidatorInterface $validator){
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -225,7 +225,7 @@ class FloorAreaController extends AbstractController
         return new Response('', 204);
     }
 
-    #[Route('/floorareas/{code}/status', methods: ['PATCH'], name: 'floorarea-status')]
+    #[Route('/api/floorareas/{code}/status', methods: ['PATCH'], name: 'floorarea-status')]
     public function changeStatus($code, Request $request, ValidatorInterface $validator){
 
         $entityManager = $this->getDoctrine()->getManager();
@@ -262,7 +262,7 @@ class FloorAreaController extends AbstractController
         return new Response('', 204);
     }
 
-    #[Route('/floorareas/{code}', methods: ['DELETE'], name: 'floorarea-delete')]
+    #[Route('/api/floorareas/{code}', methods: ['DELETE'], name: 'floorarea-delete')]
     public function delete($code){
 
         $entityManager = $this->getDoctrine()->getManager();

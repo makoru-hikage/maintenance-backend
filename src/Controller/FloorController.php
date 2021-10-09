@@ -12,7 +12,7 @@ use App\Entity\Floor;
 
 class FloorController extends AbstractController
 {
-    #[Route('/floors', methods: ['GET'], name: 'floor')]
+    #[Route('/api/floors', methods: ['GET'], name: 'floor')]
     public function index(): Response
     {
         $repo = $this->getDoctrine()->getRepository(Floor::class);
